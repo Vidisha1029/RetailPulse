@@ -3,7 +3,11 @@ import pandas as pd
 import plotly.express as px
 
 from utils import load_data, apply_filters
-
+st.title("Revenue Forecasting")
+st.info("""
+This visualization tracks monthly revenue trends to identify seasonal patterns,
+growth opportunities, and changes in business performance over time.
+""")
 df = load_data()
 df = apply_filters(df)
 monthly_sales = (

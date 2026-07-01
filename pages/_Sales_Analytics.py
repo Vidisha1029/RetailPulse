@@ -3,9 +3,12 @@ import pandas as pd
 import plotly.express as px
 
 from utils import load_data, apply_filters
+st.title("Sales_Analytics")
 
-st.title("📊 Sales Analytics")
-
+st.info("""
+This visualization tracks monthly revenue trends to identify seasonal patterns,
+growth opportunities, and changes in business performance over time.
+""")
 df = load_data()
 df = apply_filters(df)
 monthly_sales = (
@@ -38,14 +41,16 @@ st.line_chart(
 )
 st.divider()
 
+st.divider()
+
 st.subheader("🌍 Revenue by Country")
 
 country_sales = (
     df.groupby("Country")["Revenue"]
-    .sum()
-    .sort_values(ascending=False)
-    .head(10)
-    .reset_index()
+      .sum()
+      .sort_values(ascending=False)
+      .head(10)
+      .reset_index()
 )
 
 fig = px.bar(
@@ -53,133 +58,105 @@ fig = px.bar(
     x="Revenue",
     y="Country",
     orientation="h",
+    text="Revenue",
     title="Top 10 Countries by Revenue"
+)
+
+fig.update_traces(
+    texttemplate="$%{text:,.0f}",
+    textposition="outside"
+)
+
+# Display highest revenue at the top
+fig.update_yaxes(
+    categoryorder="array",
+    categoryarray=country_sales["Country"][::-1]
+)
+
+fig.update_layout(
+    xaxis_title="Revenue ($)",
+    yaxis_title="Country",
+    showlegend=False,
+    template="plotly_white",
+    margin=dict(l=20, r=20, t=50, b=20)
 )
 
 st.plotly_chart(fig, use_container_width=True)
 
 st.divider()
 st.subheader("🏆 Top 10 Products by Revenue")
+
 top_products = (
     df.groupby("Description")["Revenue"]
-    .sum()
-    .sort_values(ascending=False)
-    .head(10)
-    .reset_index()
+      .sum()
+      .sort_values(ascending=False)
+      .head(10)
+      .reset_index()
 )
+
 fig = px.bar(
     top_products,
     x="Revenue",
     y="Description",
-    orientation="h"
+    orientation="h",
+    text="Revenue"
+)
+
+fig.update_traces(
+    texttemplate="$%{text:,.0f}",
+    textposition="outside"
+)
+
+fig.update_yaxes(
+    categoryorder="total ascending"
 )
 
 st.plotly_chart(fig, use_container_width=True)
 
 st.divider()
+st.divider()
+
 st.subheader("📅 Revenue by Quarter")
+
 quarter_sales = (
     df.groupby("Quarter")["Revenue"]
-    .sum()
-    .reset_index()
+      .sum()
+      .reset_index()
+      .sort_values("Revenue", ascending=False)
 )
+
 quarter_names = {
     1: "Q1",
     2: "Q2",
     3: "Q3",
     4: "Q4"
 }
+
 quarter_sales["Quarter"] = quarter_sales["Quarter"].map(quarter_names)
+
 fig = px.bar(
     quarter_sales,
-    x="Quarter",
-    y="Revenue"
-)
-st.plotly_chart(fig, use_container_width=True)
-
-st.divider()
-st.subheader("📅 Revenue by Year")
-year_sales = (
-    df.groupby("Year")["Revenue"]
-      .sum()
-      .reset_index()
-)
-fig = px.bar(
-    year_sales,
-    x="Year",
-    y="Revenue",
-    title="Revenue by Year",
-    text_auto=".2s"
-)
-
-fig.update_xaxes(type="category")
-st.plotly_chart(fig, use_container_width=True)
-
-st.divider()
-st.subheader("👥 Top 10 Customers by Revenue")
-
-customer_sales = (
-    df.groupby("Customer ID")["Revenue"]
-      .sum()
-      .sort_values(ascending=False)
-      .head(10)
-      .reset_index()
-)
-fig = px.bar(
-    customer_sales,
     x="Revenue",
-    y="Customer ID",
+    y="Quarter",
     orientation="h",
-    title="Top 10 Customers by Revenue",
-    text_auto=".2s"
+    text="Revenue",
+    title="Revenue by Quarter"
 )
-st.plotly_chart(fig, use_container_width=True)
 
-st.divider()
-st.subheader("📅 Revenue by Day of Week")
-
-day_sales = (
-    df.groupby("DayOfWeek")["Revenue"]
-    .sum()
-    .reset_index()
-
+fig.update_traces(
+    texttemplate="$%{text:,.0f}",
+    textposition="outside"
 )
-day_order = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday"
-]
-fig = px.bar(
-    day_sales,
-    x="DayOfWeek",
-    y="Revenue",
-    title="Revenue by Day of Week",
-    text_auto=".2s"
-)
-fig.update_xaxes(
+
+fig.update_yaxes(
     categoryorder="array",
-    categoryarray=day_order
+    categoryarray=quarter_sales["Quarter"][::-1]
 )
 
-st.plotly_chart(fig, use_container_width=True)
-
-st.divider()
-
-st.subheader("🕒 Revenue by Hour")
-hour_sales = (
-    df.groupby("Hour")["Revenue"]
-    .sum()
-    .reset_index()
-)
-fig = px.line(
-    hour_sales,
-    x="Hour",
-    y="Revenue",
-    markers=True
+fig.update_layout(
+    xaxis_title="Revenue ($)",
+    yaxis_title="Quarter",
+    template="plotly_white"
 )
 
 st.plotly_chart(fig, use_container_width=True)
