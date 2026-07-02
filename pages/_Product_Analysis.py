@@ -63,7 +63,7 @@ fig.update_layout(
     margin=dict(l=20, r=20, t=50, b=20)
 )
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 
 st.divider()
 
@@ -99,7 +99,7 @@ fig.update_layout(
     yaxis_title="Product"
 )
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 st.divider()
 
 st.subheader("📋 Most Frequently Ordered Products")
@@ -136,4 +136,4 @@ fig.update_layout(
     showlegend=False
 )
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")

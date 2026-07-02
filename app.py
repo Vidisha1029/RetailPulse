@@ -1,9 +1,5 @@
 import streamlit as st
-import pandas as pd
-
-# ======================================================
-# PAGE CONFIGURATION
-# ======================================================
+from utils import load_css, load_data, footer
 
 st.set_page_config(
     page_title="RetailPulse",
@@ -11,375 +7,311 @@ st.set_page_config(
     layout="wide"
 )
 
-# ======================================================
-# LOAD DATA
-# ======================================================
-
-@st.cache_data
-def load_data():
-    try:
-        df = pd.read_csv(
-            "data/cleaned_online_retail_small.csv",
-            low_memory=False
-        )
-        return df
-
-    except Exception as e:
-        st.error(f"Error loading dataset: {e}")
-        st.stop()
+load_css()
 
 df = load_data()
 
-# ======================================================
-# CSS
-# ======================================================
+# ============================
+# HERO
+# ============================
 
 st.markdown("""
-<style>
+<div style="
+background: linear-gradient(135deg,#2563EB,#3B82F6);
+padding:70px;
+border-radius:24px;
+text-align:center;
+color:white;
+margin-bottom:40px;
+">
 
-.block-container{
-    padding-top:2rem;
-    padding-bottom:2rem;
-    max-width:1200px;
-}
+<h1 style="
+font-size:62px;
+margin-bottom:10px;
+color:white;
+font-weight:800;
+">
+📊 RetailPulse
+</h1>
 
-.main-title{
-    font-size:58px;
-    font-weight:800;
-    color:#0F172A;
-    margin-bottom:0px;
-}
+<h3 style="
+font-weight:400;
+color:#DBEAFE;
+margin-bottom:25px;
+">
+AI-Powered Retail Decision Platform
+</h3>
 
-.subtitle{
-    font-size:22px;
-    color:#2563EB;
-    font-weight:600;
-    margin-bottom:25px;
-}
+<p style="
+font-size:20px;
+max-width:850px;
+margin:auto;
+line-height:1.8;
+color:white;
+">
 
-.description{
-    font-size:18px;
-    color:#475569;
-    line-height:1.8;
-}
+Transform retail transaction data into
+interactive business intelligence,
+customer insights,
+product analytics,
+sales monitoring
+and machine learning powered revenue forecasting.
 
-.card{
-    background:#F8FAFC;
-    border-radius:15px;
-    padding:22px;
-    border:1px solid #E2E8F0;
-    margin-bottom:15px;
-}
-
-.card-title{
-    font-size:20px;
-    font-weight:700;
-    color:#1E293B;
-}
-
-.card-text{
-    color:#475569;
-    font-size:16px;
-}
-
-.metric-box{
-    background:#F8FAFC;
-    border-radius:12px;
-    padding:15px;
-    text-align:center;
-    border:1px solid #E2E8F0;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# ======================================================
-# SIDEBAR
-# ======================================================
-
-st.sidebar.title("📊 RetailPulse")
-
-st.sidebar.markdown("""
-### AI-Powered Retail Decision Platform
-
-Navigate through the dashboards:
-
-- 👨‍💼 Executive Dashboard
-- 👥 Customer Analysis
-- 📈 Sales Analytics
-- 📦 Product Analysis
-- 🔮 Revenue Forecasting
-""")
-
-# ======================================================
-# HERO SECTION
-# ======================================================
-
-st.markdown(
-    '<div class="main-title">📊 RetailPulse</div>',
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    '<div class="subtitle">AI-Powered Retail Decision Platform</div>',
-    unsafe_allow_html=True
-)
-
-st.markdown("""
-<div class="description">
-
-RetailPulse is an end-to-end Business Intelligence platform developed using
-<b>Python</b>, <b>Pandas</b>, <b>Plotly</b>, and <b>Streamlit</b>.
-
-The application transforms more than <b>one million retail transactions</b>
-into meaningful business insights through interactive dashboards,
-customer analytics, product performance analysis, sales monitoring,
-and revenue forecasting.
+</p>
 
 </div>
 """, unsafe_allow_html=True)
-
 # ======================================================
-# KPI CARDS
-# ======================================================
-
-st.divider()
-
-total_revenue = df["Revenue"].sum()
-total_orders = df["Invoice"].nunique()
-total_customers = df["Customer ID"].nunique()
-countries = df["Country"].nunique()
-
-c1, c2, c3, c4 = st.columns(4)
-
-c1.metric(
-    "💰 Revenue",
-    f"${total_revenue:,.0f}"
-)
-
-c2.metric(
-    "📦 Orders",
-    f"{total_orders:,}"
-)
-
-c3.metric(
-    "👥 Customers",
-    f"{total_customers:,}"
-)
-
-c4.metric(
-    "🌍 Countries",
-    f"{countries}"
-)
-
-# ======================================================
-# PROJECT OVERVIEW
+# HERO
 # ======================================================
 
-st.divider()
+st.markdown("---")
 
-st.header("📌 Project Overview")
-
-st.info("""
-RetailPulse enables organizations to monitor business performance,
-understand customer behaviour, evaluate product performance,
-analyze sales trends, and forecast future revenue for better
-decision-making.
-""")
-
-# ======================================================
-# FEATURES
-# ======================================================
-
-st.divider()
-
-st.header("🚀 Dashboard Modules")
-
-col1, col2 = st.columns(2)
-
-with col1:
-
-    st.markdown("""
-<div class="card">
-<div class="card-title">👨‍💼 Executive Dashboard</div>
-
-<div class="card-text">
-
-• Business KPIs
-
-• Revenue Trends
-
-• Country Performance
-
-• Business Overview
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-    st.markdown("""
-<div class="card">
-<div class="card-title">👥 Customer Analysis</div>
-
-<div class="card-text">
-
-• Customer Segmentation
-
-• RFM Analysis
-
-• Top Customers
-
-• Customer Insights
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-    st.markdown("""
-<div class="card">
-<div class="card-title">📈 Sales Analytics</div>
-
-<div class="card-text">
-
-• Monthly Sales
-
-• Sales Trends
-
-• Order Analysis
-
-• Seasonal Performance
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-with col2:
-
-    st.markdown("""
-<div class="card">
-<div class="card-title">📦 Product Analysis</div>
-
-<div class="card-text">
-
-• Best Selling Products
-
-• Revenue Contribution
-
-• Product Performance
-
-• Product Insights
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-    st.markdown("""
-<div class="card">
-<div class="card-title">🔮 Revenue Forecasting</div>
-
-<div class="card-text">
-
-• Machine Learning
-
-• Revenue Prediction
-
-• Trend Forecast
-
-• Business Planning
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-    st.markdown("""
-<div class="card">
-<div class="card-title">📊 Interactive Dashboards</div>
-
-<div class="card-text">
-
-• Dynamic Filters
-
-• Interactive Charts
-
-• Real-Time Insights
-
-• Executive Reporting
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-# ======================================================
-# DATASET
-# ======================================================
-
-st.divider()
-
-st.header("📂 Dataset Information")
-
-left, right = st.columns(2)
+left,right=st.columns([1.3,1])
 
 with left:
 
     st.markdown("""
-### Dataset
+# Why RetailPulse?
 
-- Source: UCI Online Retail II Dataset
-- Transactions: 1,067,371+
-- Customers: 5,199
-- Countries: 37
-- Period: 2009–2011
+Every retail company generates enormous amounts of transactional data.
+
+Without analytics, these numbers remain hidden inside spreadsheets.
+
+RetailPulse converts raw data into interactive dashboards that help businesses:
+
+• Understand customers
+
+• Monitor revenue
+
+• Discover top-performing products
+
+• Forecast future sales
+
+• Make confident business decisions
+
 """)
 
 with right:
 
+    st.info("""
+### 🚀 Platform Highlights
+
+✔ Executive Dashboard
+
+✔ Customer Analytics
+
+✔ Product Intelligence
+
+✔ Sales Monitoring
+
+✔ Revenue Forecasting
+
+✔ Interactive Visualizations
+""")
+    
+    # ======================================================
+# BUSINESS SNAPSHOT
+# ======================================================
+
+st.markdown("## 📊 Business Snapshot")
+
+st.caption("A quick overview of the business before exploring detailed dashboards.")
+
+c1,c2,c3,c4=st.columns(4)
+
+with c1:
+    st.metric(
+        "💰 Revenue",
+        "$2.0M",
+        "+12.8%"
+    )
+
+with c2:
+    st.metric(
+        "📦 Orders",
+        "27,631",
+        "+8.4%"
+    )
+
+with c3:
+    st.metric(
+        "👥 Customers",
+        "5,199",
+        "+342"
+    )
+
+with c4:
+    st.metric(
+        "🌍 Countries",
+        "43",
+        "+4"
+    )
+
+    # ======================================================
+# STORY
+# ======================================================
+
+st.markdown("---")
+
+left,right=st.columns([1.5,1])
+
+with left:
+
     st.markdown("""
-### Technologies
+## 📖 Why RetailPulse?
 
-- Python
-- Pandas
-- Plotly
-- Streamlit
-- Machine Learning
-- Time Series Forecasting
+Every retail company generates thousands of invoices every day.
+
+Unfortunately, raw spreadsheets cannot answer important business questions like:
+
+- Why are sales increasing?
+
+- Which customers generate the highest revenue?
+
+- Which products should be restocked?
+
+- Which countries drive most sales?
+
+- What will next month's revenue look like?
+
+RetailPulse transforms raw transactional data into powerful business intelligence dashboards that help organizations make faster and smarter decisions.
 """)
 
-# ======================================================
-# BUSINESS VALUE
-# ======================================================
+with right:
 
-st.divider()
+    st.success("""
 
-st.header("🎯 Business Value")
+### 🚀 Platform Features
 
-st.success("""
-RetailPulse empowers organizations to:
+✔ Executive Dashboard
 
-✔ Improve customer retention
+✔ Customer Intelligence
 
-✔ Identify high-value customers
+✔ Product Analytics
 
-✔ Optimize product strategy
+✔ Sales Performance
 
-✔ Track sales performance
+✔ Revenue Forecasting
 
-✔ Forecast future revenue
+✔ Interactive Dashboards
 
-✔ Make data-driven business decisions
 """)
-
+    
+    # ======================================================
+# DASHBOARD SUITE
 # ======================================================
-# FOOTER
-# ======================================================
 
-st.divider()
+st.markdown("---")
+
+st.markdown("## 🚀 Explore RetailPulse")
 
 st.caption(
-    "Developed by Vidisha More • Python • Pandas • Plotly • Streamlit"
+    "Choose any dashboard below to begin exploring the analytics."
+)
+
+cards = [
+
+("👨‍💼","Executive Dashboard",
+"Business KPIs, revenue trends and executive insights"),
+
+("👥","Customer Analysis",
+"Customer segmentation, RFM analysis and lifetime value"),
+
+("📈","Sales Analytics",
+"Sales performance, monthly trends and country analysis"),
+
+("📦","Product Analysis",
+"Best-selling products and revenue contribution"),
+
+("🔮","Revenue Forecasting",
+"Predict future revenue using machine learning"),
+
+("💡","Business Intelligence",
+"Complete analytical overview for decision making")
+
+]
+
+col1,col2=st.columns(2)
+
+for i,card in enumerate(cards):
+
+    with (col1 if i%2==0 else col2):
+
+        st.container(border=True)
+
+        st.markdown(f"""
+### {card[0]} {card[1]}
+
+{card[2]}
+
+➡️ **Open Dashboard**
+""")
+        
+# ======================================================
+# PIPELINE
+# ======================================================
+
+st.markdown("---")
+
+st.markdown("## ⚙️ Analytics Workflow")
+
+c1,c2,c3,c4,c5=st.columns(5)
+
+c1.info("📥\n\nCollect\nData")
+c2.info("🧹\n\nClean\nData")
+c3.info("📊\n\nAnalyze")
+c4.info("🤖\n\nForecast")
+c5.info("💼\n\nBusiness\nDecision")
+
+# ======================================================
+# TECH STACK
+# ======================================================
+
+st.markdown("---")
+
+col1,col2=st.columns(2)
+
+with col1:
+
+    st.markdown("""
+### 💻 Technology Stack
+
+- Python
+
+- Pandas
+
+- Plotly
+
+- Streamlit
+
+- Scikit-Learn
+
+- Statsmodels
+""")
+
+with col2:
+
+    st.markdown("""
+### 📂 Dataset
+
+- Online Retail II
+
+- 1,067,371 Transactions
+
+- 5,199 Customers
+
+- 43 Countries
+
+- 2009–2011
+""")
+    
+st.markdown("---")
+
+st.caption(
+"""
+Developed by **Vidisha More**
+
+RetailPulse • Python • Pandas • Plotly • Streamlit
+"""
 )
