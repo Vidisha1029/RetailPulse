@@ -6,7 +6,15 @@ from utils import (
     load_data,
     apply_filters,
     load_css,
-    footer
+    hero,
+    section,
+    chart_title,
+    kpi_row,
+    insight_box,
+    recommendation_box,
+    spacer,
+    footer,
+    two_columns
 )
 
 # =====================================================
@@ -22,85 +30,6 @@ st.set_page_config(
 load_css()
 
 # =====================================================
-# DARK THEME
-# =====================================================
-
-st.markdown("""
-<style>
-
-.stApp{
-    background:#0F172A;
-}
-
-.block-container{
-    max-width:1450px;
-    padding-top:1.5rem;
-}
-
-h1,h2,h3,h4,label,p{
-    color:white !important;
-}
-
-[data-testid="metric-container"]{
-    background:transparent;
-    border:none;
-    box-shadow:none;
-}
-
-.chart-card{
-
-    background:#16213E;
-
-    padding:25px;
-
-    border-radius:20px;
-
-    margin-top:25px;
-
-    margin-bottom:25px;
-
-    border:1px solid #243B6B;
-
-}
-
-.hero{
-
-    background:linear-gradient(135deg,#0F172A,#1E3A8A);
-
-    padding:45px;
-
-    border-radius:24px;
-
-    color:white;
-
-    margin-bottom:25px;
-
-}
-
-.kpi{
-
-    background:#16213E;
-
-    padding:22px;
-
-    border-radius:18px;
-
-    text-align:center;
-
-    border:1px solid #243B6B;
-
-}
-
-.kpi:hover{
-
-    border:1px solid #3B82F6;
-
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# =====================================================
 # LOAD DATA
 # =====================================================
 
@@ -108,375 +37,296 @@ df = load_data()
 df = apply_filters(df)
 
 if df.empty:
-    st.warning("No data available.")
+    st.warning("No data available for the selected filters.")
     st.stop()
-
-# =====================================================
-# INVENTORY KPIs
-# =====================================================
-
-total_products = df["Description"].nunique()
-units_sold = int(df["Quantity"].sum())
-inventory_value = df["Revenue"].sum()
-orders = df["Invoice"].nunique()
-
-# Dummy inventory status (can later replace with calculations)
-reorder_alerts = int(total_products * 0.18)
-overstock = int(total_products * 0.10)
-stock_ok = total_products - reorder_alerts - overstock
 
 # =====================================================
 # HERO
 # =====================================================
 
-st.markdown("""
-<div class="hero">
+hero(
+    "📦 Inventory Optimization",
+    "Optimizing Inventory Through Sales Behaviour",
+    """
+Inventory Optimization helps businesses maintain the right products in the right quantities.
 
-<h1 style="
-font-size:58px;
-margin-bottom:15px;
-font-weight:800;
-color:white;
-">
-
-📦 Inventory Optimization
-
-</h1>
-
-<p style="
-font-size:22px;
-color:#E2E8F0;
-margin-bottom:35px;
-">
-
-EOQ • Safety Stock • Reorder Point
-
-</p>
-
-<p style="
-font-size:18px;
-line-height:1.8;
-color:#CBD5E1;
-">
-
-Identify inventory risks, optimize stock levels, prevent stock-outs
-and improve warehouse efficiency using retail transaction analytics.
-
-</p>
-
-</div>
-""", unsafe_allow_html=True)
-
-# =====================================================
-# KPI ROW
-# =====================================================
-
-c1, c2, c3, c4 = st.columns(4)
-
-with c1:
-    st.markdown(f"""
-<div class="kpi">
-
-<h1>🔴</h1>
-
-<h3 style="color:white;">Reorder Alerts</h3>
-
-<h2 style="color:#F87171;">{reorder_alerts}</h2>
-
-</div>
-""", unsafe_allow_html=True)
-
-with c2:
-    st.markdown(f"""
-<div class="kpi">
-
-<h1>🟡</h1>
-
-<h3 style="color:white;">Overstock</h3>
-
-<h2 style="color:#FBBF24;">{overstock}</h2>
-
-</div>
-""", unsafe_allow_html=True)
-
-with c3:
-    st.markdown(f"""
-<div class="kpi">
-
-<h1>🟢</h1>
-
-<h3 style="color:white;">Stock OK</h3>
-
-<h2 style="color:#4ADE80;">{stock_ok}</h2>
-
-</div>
-""", unsafe_allow_html=True)
-
-with c4:
-    st.markdown(f"""
-<div class="kpi">
-
-<h1>📦</h1>
-
-<h3 style="color:white;">Products</h3>
-
-<h2 style="color:#60A5FA;">{total_products}</h2>
-
-</div>
-""", unsafe_allow_html=True)
-    
-# =====================================================
-# DASHBOARD TABS
-# =====================================================
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-alerts_tab, analytics_tab, table_tab = st.tabs(
-    [
-        "🚨 Alerts",
-        "📊 Analytics",
-        "📋 Full Inventory"
-    ]
+This dashboard identifies fast-moving products, classifies inventory using the ABC method,
+analyzes seasonal demand patterns and highlights products that require strategic inventory planning.
+"""
 )
 
-with alerts_tab:
+spacer(2)
 
-    st.markdown("""
-    <div class="chart-card">
+# =====================================================
+# INVENTORY KPIs
+# =====================================================
 
-    <h2 style="color:white;margin-bottom:8px;">
-    🔴 Reorder Alerts
-    </h2>
+section(
+    "📊 Inventory Overview",
+    "Key inventory and demand indicators."
+)
 
-    <p style="color:#CBD5E1;font-size:17px;">
-    Products with the highest inventory demand that should be replenished soon.
-    </p>
+total_units = int(df["Quantity"].sum())
 
-    </div>
-    """, unsafe_allow_html=True)
+active_products = df["Description"].nunique()
 
-    top_products = (
-        df.groupby("Description")["Quantity"]
-          .sum()
-          .sort_values(ascending=False)
-          .head(20)
-          .reset_index()
-    )
+monthly_demand = (
+    df.groupby("MonthName")["Quantity"]
+      .sum()
+      .mean()
+)
 
-    fig = px.bar(
-        top_products,
-        x="Description",
-        y="Quantity",
-        color="Quantity",
-        color_continuous_scale="Reds"
-    )
+avg_velocity = (
+    df.groupby("Description")["Quantity"]
+      .sum()
+      .mean()
+)
 
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#16213E",
-        plot_bgcolor="#16213E",
-        height=520,
-        margin=dict(l=20, r=20, t=20, b=20),
-        coloraxis_showscale=False,
-        xaxis_title="Products",
-        yaxis_title="Units Sold"
-    )
+fastest_product = (
+    df.groupby("Description")["Quantity"]
+      .sum()
+      .idxmax()
+)
 
-    st.plotly_chart(fig, use_container_width=True)
+kpi_row([
 
-    st.info(
-        "Products with the highest sales volume should maintain higher safety stock levels to avoid stock-outs."
-    )
-with analytics_tab:
+{
+"title":"📦 Units Sold",
+"value":f"{total_units:,}"
+},
 
-    # =====================================================
-    # PRODUCT PERFORMANCE
-    # =====================================================
+{
+"title":"🛍 Active Products",
+"value":f"{active_products:,}"
+},
 
-    st.markdown("""
-    <div class="chart-card">
+{
+"title":"📈 Avg Monthly Demand",
+"value":f"{monthly_demand:,.0f}"
+},
 
-    <h2 style="color:white;">
-    📊 Inventory Analytics
-    </h2>
+{
+"title":"⚡ Avg Product Velocity",
+"value":f"{avg_velocity:,.0f}"
+},
 
-    <p style="color:#CBD5E1;">
-    Analyze inventory movement, product demand and warehouse performance.
-    </p>
+{
+"title":"🏆 Fastest Moving Product",
+"value":(
+    fastest_product[:18] + "..."
+    if len(fastest_product) > 18
+    else fastest_product
+)
+}
 
-    </div>
-    """, unsafe_allow_html=True)
+])
 
-    # -------------------------------------------------
-    # Top Revenue Products
-    # -------------------------------------------------
+insight_box(
+"""
+These KPIs summarize overall product movement and demand. Products with consistently high sales velocity should receive greater inventory attention to reduce the risk of stockouts.
+"""
+)
 
-    revenue_products = (
-        df.groupby("Description")["Revenue"]
-        .sum()
-        .sort_values(ascending=False)
-        .head(10)
-        .reset_index()
-    )
+spacer(2)
 
-    fig = px.bar(
-        revenue_products,
-        x="Revenue",
-        y="Description",
-        orientation="h",
-        color="Revenue",
-        color_continuous_scale="Blues"
-    )
+# =====================================================
+# ABC INVENTORY CLASSIFICATION
+# =====================================================
 
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#16213E",
-        plot_bgcolor="#16213E",
-        height=500,
-        margin=dict(l=20, r=20, t=20, b=20),
-        coloraxis_showscale=False,
-        yaxis=dict(autorange="reversed")
-    )
+section(
+    "📦 ABC Inventory Classification",
+    "Prioritize inventory using cumulative revenue contribution."
+)
 
-    st.plotly_chart(fig, width="stretch")
+# -----------------------------------------------------
+# Product Revenue
+# -----------------------------------------------------
 
-    st.success(
-        "High revenue products should always receive priority during inventory replenishment."
-    )
+abc = (
+    df.groupby("ShortDescription", as_index=False)
+      .agg(
+          Revenue=("Revenue", "sum")
+      )
+      .sort_values("Revenue", ascending=False)
+)
 
-    st.divider()
+# Revenue %
 
-    # -------------------------------------------------
-    # Inventory by Country
-    # -------------------------------------------------
+abc["Revenue %"] = (
+    abc["Revenue"] /
+    abc["Revenue"].sum()
+)
 
-    country = (
-        df.groupby("Country")["Quantity"]
-        .sum()
-        .sort_values(ascending=False)
-        .head(10)
-        .reset_index()
-    )
+abc["Cumulative %"] = abc["Revenue %"].cumsum()
 
-    fig = px.bar(
-        country,
-        x="Quantity",
-        y="Country",
-        orientation="h",
-        color="Quantity",
-        color_continuous_scale="Viridis"
-    )
+# ABC Classification
 
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#16213E",
-        plot_bgcolor="#16213E",
-        height=450,
-        margin=dict(l=20, r=20, t=20, b=20),
-        coloraxis_showscale=False,
-        yaxis=dict(autorange="reversed")
-    )
+def classify(value):
 
-    st.plotly_chart(fig, width="stretch")
+    if value <= 0.70:
+        return "A"
 
-    st.info(
-        "Countries with consistently high demand require optimized warehouse allocation."
-    )
+    elif value <= 0.90:
+        return "B"
 
-    st.divider()
+    else:
+        return "C"
 
-    # -------------------------------------------------
-    # Monthly Demand
-    # -------------------------------------------------
+abc["Category"] = abc["Cumulative %"].apply(classify)
 
-    monthly = (
-        df.groupby("Month")["Quantity"]
-        .sum()
-        .reset_index()
-    )
+abc_summary = (
+    abc.groupby("Category", as_index=False)
+       .agg(
+           Products=("ShortDescription", "count"),
+           Revenue=("Revenue", "sum")
+       )
+)
 
-    month_map = {
-        1: "Jan",
-        2: "Feb",
-        3: "Mar",
-        4: "Apr",
-        5: "May",
-        6: "Jun",
-        7: "Jul",
-        8: "Aug",
-        9: "Sep",
-        10: "Oct",
-        11: "Nov",
-        12: "Dec"
+chart_title(
+    "ABC Inventory Classification",
+    "Products classified according to cumulative revenue contribution."
+)
+
+fig = px.bar(
+    abc_summary,
+    x="Category",
+    y="Products",
+    color="Category",
+    text="Products",
+    category_orders={"Category": ["A", "B", "C"]},
+    color_discrete_map={
+        "A": "#2563EB",
+        "B": "#F59E0B",
+        "C": "#94A3B8"
     }
+)
 
-    monthly["Month"] = monthly["Month"].map(month_map)
+fig.update_traces(
+    textposition="outside"
+)
 
-    fig = px.line(
-        monthly,
-        x="Month",
-        y="Quantity",
-        markers=True
-    )
+fig.update_layout(
+    template="plotly_white",
+    height=450,
+    xaxis_title="Inventory Category",
+    yaxis_title="Number of Products",
+    showlegend=False
+)
 
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="#16213E",
-        plot_bgcolor="#16213E",
-        height=420,
-        margin=dict(l=20, r=20, t=20, b=20)
-    )
+st.plotly_chart(
+    fig,
+    use_container_width=True
+)
 
-    st.plotly_chart(fig, width="stretch")
+a_products = abc_summary.loc[
+    abc_summary["Category"] == "A",
+    "Products"
+].iloc[0]
 
-    st.success(
-        "Monthly demand trends help forecast future inventory requirements."
-    )
+insight_box(
+f"""
+Category A contains **{a_products}** products that contribute the majority of business revenue. These products require the highest inventory control, frequent replenishment and close monitoring to prevent stockouts.
+"""
+)
+
+recommendation_box(
+"""
+Focus forecasting and replenishment efforts on Category A products. Review Category C items periodically for slow movement, excess inventory or possible discontinuation to improve inventory efficiency.
+"""
+)
+
+spacer(2)
+
 # =====================================================
-# FULL INVENTORY
+# MONTHLY PRODUCT DEMAND HEATMAP
 # =====================================================
 
-with table_tab:
+section(
+    "🔥 Seasonal Product Demand",
+    "Analyze monthly demand patterns for the highest-selling products."
+)
 
-    st.markdown("""
-    <div class="chart-card">
+# -----------------------------------------------------
+# Top 15 Products by Quantity
+# -----------------------------------------------------
 
-    <h2 style="color:white;">
-    📋 Inventory Details
-    </h2>
+top_products = (
+    df.groupby("ShortDescription")["Quantity"]
+      .sum()
+      .sort_values(ascending=False)
+      .head(15)
+      .index
+)
 
-    <p style="color:#CBD5E1;">
-    Explore product-level inventory information, quantities sold and revenue contribution.
-    </p>
+heatmap_df = (
+    df[df["ShortDescription"].isin(top_products)]
+      .groupby(["ShortDescription", "MonthName"])["Quantity"]
+      .sum()
+      .reset_index()
+)
 
-    </div>
-    """, unsafe_allow_html=True)
+# Keep months in calendar order
+month_order = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+]
 
-    inventory_table = (
-        df.groupby("Description")
-          .agg(
-              Total_Quantity=("Quantity", "sum"),
-              Revenue=("Revenue", "sum"),
-              Orders=("Invoice", "nunique")
-          )
-          .reset_index()
-          .sort_values("Revenue", ascending=False)
+heatmap_df["MonthName"] = pd.Categorical(
+    heatmap_df["MonthName"],
+    categories=month_order,
+    ordered=True
+)
+
+heatmap_pivot = (
+    heatmap_df
+    .pivot(
+        index="ShortDescription",
+        columns="MonthName",
+        values="Quantity"
     )
+    .fillna(0)
+)
 
-    inventory_table["Revenue"] = inventory_table["Revenue"].map(
-        lambda x: f"${x:,.2f}"
+chart_title(
+    "Monthly Demand Heatmap",
+    "Darker colors indicate higher sales volume."
+)
+
+fig = px.imshow(
+    heatmap_pivot,
+    aspect="auto",
+    color_continuous_scale="Blues",
+    labels=dict(
+        color="Units Sold"
     )
+)
 
-    st.dataframe(
-        inventory_table,
-        use_container_width=True,
-        hide_index=True,
-        height=600
-    )
+fig.update_layout(
+    template="plotly_white",
+    height=650,
+    xaxis_title="Month",
+    yaxis_title="Product"
+)
 
-    st.success(
-        "Use this table to identify high-performing products and support inventory planning decisions."
-    )
+st.plotly_chart(
+    fig,
+    use_container_width=True
+)
 
-    footer()
+insight_box(
+"""
+The heatmap reveals seasonal demand patterns across the highest-selling products.
+Products with recurring peaks should be stocked proactively before high-demand months,
+while consistently low-demand products require less aggressive inventory planning.
+"""
+)
+
+recommendation_box(
+"""
+Align purchasing and replenishment schedules with seasonal demand.
+Increase safety stock before peak periods for high-demand products and reduce excess inventory for products with consistently low demand.
+"""
+)
+
+spacer(2)
 

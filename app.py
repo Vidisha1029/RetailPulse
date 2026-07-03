@@ -1,5 +1,19 @@
 import streamlit as st
-from utils import load_css, load_data, footer
+
+from utils import (
+    load_css,
+    hero,
+    section,
+    info_card,
+    spacer,
+    two_columns,
+    three_columns,
+    footer
+)
+
+# ======================================================
+# PAGE CONFIG
+# ======================================================
 
 st.set_page_config(
     page_title="RetailPulse",
@@ -9,309 +23,346 @@ st.set_page_config(
 
 load_css()
 
-df = load_data()
-
-# ============================
-# HERO
-# ============================
-
-st.markdown("""
-<div style="
-background: linear-gradient(135deg,#2563EB,#3B82F6);
-padding:70px;
-border-radius:24px;
-text-align:center;
-color:white;
-margin-bottom:40px;
-">
-
-<h1 style="
-font-size:62px;
-margin-bottom:10px;
-color:white;
-font-weight:800;
-">
-📊 RetailPulse
-</h1>
-
-<h3 style="
-font-weight:400;
-color:#DBEAFE;
-margin-bottom:25px;
-">
-AI-Powered Retail Decision Platform
-</h3>
-
-<p style="
-font-size:20px;
-max-width:850px;
-margin:auto;
-line-height:1.8;
-color:white;
-">
-
-Transform retail transaction data into
-interactive business intelligence,
-customer insights,
-product analytics,
-sales monitoring
-and machine learning powered revenue forecasting.
-
-</p>
-
-</div>
-""", unsafe_allow_html=True)
 # ======================================================
 # HERO
 # ======================================================
 
-st.markdown("---")
+hero(
 
-left,right=st.columns([1.3,1])
+    "📊 RetailPulse",
+
+    "AI-Powered Retail Decision Platform",
+
+    """
+RetailPulse is an end-to-end Business Intelligence platform developed to help
+retail organizations transform transactional data into strategic business decisions.
+
+The platform combines Exploratory Data Analysis (EDA), Executive Reporting,
+Customer Intelligence, Inventory Optimization, Product Performance Analysis,
+and Sales Forecasting to support data-driven decision making.
+
+Built using Python, Pandas, Plotly and Streamlit, RetailPulse demonstrates
+how modern analytics can improve operational efficiency, customer retention,
+inventory planning and business growth.
+"""
+
+)
+
+spacer(2)
+
+# ======================================================
+# BUSINESS PROBLEM
+# ======================================================
+
+section(
+    "💼 Business Problem",
+    "The challenges RetailPulse is designed to solve."
+)
+
+left, right = two_columns(2, 1)
 
 with left:
 
-    st.markdown("""
-# Why RetailPulse?
+    info_card(
+        "Why RetailPulse?",
+        """
+Retail businesses generate large volumes of transactional data every day.
 
-Every retail company generates enormous amounts of transactional data.
+Without a centralized analytics platform, decision-makers struggle to:
 
-Without analytics, these numbers remain hidden inside spreadsheets.
+• Monitor business performance
 
-RetailPulse converts raw data into interactive dashboards that help businesses:
+• Identify sales trends
 
-• Understand customers
+• Understand customer purchasing behaviour
 
-• Monitor revenue
+• Detect customer churn
 
-• Discover top-performing products
+• Optimize inventory levels
 
-• Forecast future sales
+• Forecast future demand
 
-• Make confident business decisions
-
-""")
+RetailPulse integrates descriptive, diagnostic and predictive analytics
+into one unified platform, enabling faster and more informed business decisions.
+"""
+    )
 
 with right:
 
-    st.info("""
-### 🚀 Platform Highlights
-
-✔ Executive Dashboard
-
-✔ Customer Analytics
-
-✔ Product Intelligence
-
-✔ Sales Monitoring
-
-✔ Revenue Forecasting
-
-✔ Interactive Visualizations
-""")
-    
-    # ======================================================
-# BUSINESS SNAPSHOT
-# ======================================================
-
-st.markdown("## 📊 Business Snapshot")
-
-st.caption("A quick overview of the business before exploring detailed dashboards.")
-
-c1,c2,c3,c4=st.columns(4)
-
-with c1:
-    st.metric(
-        "💰 Revenue",
-        "$2.0M",
-        "+12.8%"
-    )
-
-with c2:
-    st.metric(
-        "📦 Orders",
-        "27,631",
-        "+8.4%"
-    )
-
-with c3:
-    st.metric(
-        "👥 Customers",
-        "5,199",
-        "+342"
-    )
-
-with c4:
-    st.metric(
-        "🌍 Countries",
-        "43",
-        "+4"
-    )
-
-    # ======================================================
-# STORY
-# ======================================================
-
-st.markdown("---")
-
-left,right=st.columns([1.5,1])
-
-with left:
-
-    st.markdown("""
-## 📖 Why RetailPulse?
-
-Every retail company generates thousands of invoices every day.
-
-Unfortunately, raw spreadsheets cannot answer important business questions like:
-
-- Why are sales increasing?
-
-- Which customers generate the highest revenue?
-
-- Which products should be restocked?
-
-- Which countries drive most sales?
-
-- What will next month's revenue look like?
-
-RetailPulse transforms raw transactional data into powerful business intelligence dashboards that help organizations make faster and smarter decisions.
-""")
-
-with right:
-
-    st.success("""
-
-### 🚀 Platform Features
-
-✔ Executive Dashboard
+    info_card(
+        "🎯 Project Objectives",
+        """
+✔ Executive Reporting
 
 ✔ Customer Intelligence
 
+✔ Inventory Optimization
+
 ✔ Product Analytics
 
-✔ Sales Performance
+✔ Sales Forecasting
 
-✔ Revenue Forecasting
+✔ Business Recommendations
+"""
+    )
 
-✔ Interactive Dashboards
+spacer(2)
 
-""")
-    
-    # ======================================================
-# DASHBOARD SUITE
+
+# ======================================================
+# PLATFORM MODULES
 # ======================================================
 
-st.markdown("---")
-
-st.markdown("## 🚀 Explore RetailPulse")
-
-st.caption(
-    "Choose any dashboard below to begin exploring the analytics."
+section(
+    "🧩 Analytics Modules",
+    "RetailPulse consists of six integrated analytics modules, each designed to answer a different business question."
 )
 
-cards = [
+modules = [
 
-("👨‍💼","Executive Dashboard",
-"Business KPIs, revenue trends and executive insights"),
+{
+"title":"📊 Exploratory Data Analysis",
+"text":"Assess data quality, understand distributions, detect outliers, evaluate correlations and prepare data for analytics."
+},
 
-("👥","Customer Analysis",
-"Customer segmentation, RFM analysis and lifetime value"),
+{
+"title":"👨‍💼 Executive Dashboard",
+"text":"Monitor executive KPIs, revenue trends, geographic performance and high-level business health."
+},
 
-("📈","Sales Analytics",
-"Sales performance, monthly trends and country analysis"),
+{
+"title":"👥 Customer Intelligence",
+"text":"Perform RFM segmentation, identify loyal customers, detect churn risk and evaluate customer lifetime value."
+},
 
-("📦","Product Analysis",
-"Best-selling products and revenue contribution"),
+{
+"title":"📦 Inventory Optimization",
+"text":"Optimize stock levels using ABC analysis, Pareto analysis, reorder insights and demand trends."
+},
 
-("🔮","Revenue Forecasting",
-"Predict future revenue using machine learning"),
+{
+"title":"🛍 Product Intelligence",
+"text":"Analyze product profitability, demand patterns, top performers and revenue contribution."
+},
 
-("💡","Business Intelligence",
-"Complete analytical overview for decision making")
+{
+"title":"🔮 Sales Forecasting",
+"text":"Forecast future revenue using historical transaction patterns to support strategic planning."
+}
 
 ]
 
-col1,col2=st.columns(2)
+row1 = st.columns(3)
 
-for i,card in enumerate(cards):
+for col, module in zip(row1, modules[:3]):
 
-    with (col1 if i%2==0 else col2):
+    with col:
 
-        st.container(border=True)
+        info_card(
+            module["title"],
+            module["text"]
+        )
+
+row2 = st.columns(3)
+
+for col, module in zip(row2, modules[3:]):
+
+    with col:
+
+        info_card(
+            module["title"],
+            module["text"]
+        )
+
+spacer(2)
+
+# ======================================================
+# ANALYTICS WORKFLOW
+# ======================================================
+
+section(
+    "🔄 Analytics Workflow",
+    "RetailPulse follows a structured data analytics lifecycle."
+)
+
+workflow = st.columns(6)
+
+steps = [
+
+("📥","Data Collection"),
+("🧹","Data Cleaning"),
+("📊","EDA"),
+("📈","Business Intelligence"),
+("🤖","Forecasting"),
+("💡","Business Decisions")
+
+]
+
+for col, (icon, label) in zip(workflow, steps):
+
+    with col:
 
         st.markdown(f"""
-### {card[0]} {card[1]}
+<div class="card" style="text-align:center;min-height:170px;">
 
-{card[2]}
+<div style="font-size:44px;">
+{icon}
+</div>
 
-➡️ **Open Dashboard**
-""")
-        
-# ======================================================
-# PIPELINE
-# ======================================================
+<h4 style="margin-top:15px;">
+{label}
+</h4>
 
-st.markdown("---")
+</div>
+""", unsafe_allow_html=True)
 
-st.markdown("## ⚙️ Analytics Workflow")
-
-c1,c2,c3,c4,c5=st.columns(5)
-
-c1.info("📥\n\nCollect\nData")
-c2.info("🧹\n\nClean\nData")
-c3.info("📊\n\nAnalyze")
-c4.info("🤖\n\nForecast")
-c5.info("💼\n\nBusiness\nDecision")
+spacer(2)
 
 # ======================================================
-# TECH STACK
+# TECHNOLOGY STACK
 # ======================================================
 
-st.markdown("---")
-
-col1,col2=st.columns(2)
-
-with col1:
-
-    st.markdown("""
-### 💻 Technology Stack
-
-- Python
-
-- Pandas
-
-- Plotly
-
-- Streamlit
-
-- Scikit-Learn
-
-- Statsmodels
-""")
-
-with col2:
-
-    st.markdown("""
-### 📂 Dataset
-
-- Online Retail II
-
-- 1,067,371 Transactions
-
-- 5,199 Customers
-
-- 43 Countries
-
-- 2009–2011
-""")
-    
-st.markdown("---")
-
-st.caption(
-"""
-Developed by **Vidisha More**
-
-RetailPulse • Python • Pandas • Plotly • Streamlit
-"""
+section(
+    "⚙️ Technology Stack",
+    "RetailPulse combines data engineering, analytics, visualization and forecasting technologies."
 )
+
+tech1, tech2, tech3 = st.columns(3)
+
+with tech1:
+
+    info_card(
+        "🐍 Data Processing",
+        """
+• Python
+
+• Pandas
+
+• NumPy
+
+• Data Cleaning
+
+• Feature Engineering
+"""
+    )
+
+with tech2:
+
+    info_card(
+        "📊 Visualization",
+        """
+• Streamlit
+
+• Plotly
+
+• Interactive Dashboards
+
+• Business Intelligence
+
+• KPI Reporting
+"""
+    )
+
+with tech3:
+
+    info_card(
+        "🤖 Analytics & Forecasting",
+        """
+• RFM Analysis
+
+• Customer Segmentation
+
+• Inventory Optimization
+
+• Time Series Forecasting
+
+• Business Recommendations
+"""
+    )
+
+spacer(2)
+
+# ======================================================
+# BUSINESS IMPACT
+# ======================================================
+
+section(
+    "📈 Business Impact",
+    "How RetailPulse helps decision-makers transform data into business value."
+)
+
+impact1, impact2 = two_columns()
+
+with impact1:
+
+    info_card(
+        "📌 Key Benefits",
+        """
+✔ Improve executive visibility
+
+✔ Detect customer churn
+
+✔ Optimize inventory levels
+
+✔ Identify profitable products
+
+✔ Forecast future revenue
+
+✔ Support strategic planning
+"""
+    )
+
+with impact2:
+
+    info_card(
+        "🎯 Business Outcomes",
+        """
+• Better decision-making
+
+• Reduced stock-outs
+
+• Improved customer retention
+
+• Revenue optimization
+
+• Operational efficiency
+
+• Data-driven business strategy
+"""
+    )
+
+spacer(2)
+
+# ======================================================
+# PROJECT OVERVIEW
+# ======================================================
+
+section(
+    "📖 Project Overview",
+    "RetailPulse was developed as an end-to-end retail analytics solution using the Online Retail II dataset."
+)
+
+st.markdown("""
+<div class="card">
+
+This project demonstrates the complete lifecycle of a modern analytics solution:
+
+<ul style="line-height:2; color:#475569; font-size:16px;">
+
+<li><b>Data Preparation</b> – Cleaning and transforming raw retail transactions.</li>
+
+<li><b>Exploratory Data Analysis</b> – Understanding distributions, trends and relationships.</li>
+
+<li><b>Business Intelligence</b> – Executive, customer, product and inventory dashboards.</li>
+
+<li><b>Predictive Analytics</b> – Forecasting future sales trends.</li>
+
+<li><b>Decision Support</b> – Delivering actionable recommendations through interactive dashboards.</li>
+
+</ul>
+
+</div>
+""", unsafe_allow_html=True)
+
+spacer(2)
+footer()

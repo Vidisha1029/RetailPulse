@@ -6,457 +6,372 @@ from utils import (
     load_data,
     apply_filters,
     load_css,
+    hero,
+    section,
+    chart_title,
+    kpi_row,
     insight_box,
-    footer
+    recommendation_box,
+    spacer,
+    footer,
+    two_columns
 )
 
-# ======================================================
+# =====================================================
 # PAGE CONFIG
-# ======================================================
+# =====================================================
 
 st.set_page_config(
-    page_title="Customer Analysis",
+    page_title="Customer Intelligence",
     page_icon="👥",
     layout="wide"
 )
 
 load_css()
 
-# ======================================================
+# =====================================================
 # LOAD DATA
-# ======================================================
+# =====================================================
 
 df = load_data()
 df = apply_filters(df)
 
 if df.empty:
-    st.warning("No data available for the selected filters.")
+    st.warning("No data available.")
     st.stop()
 
-# ======================================================
-# HERO SECTION
-# ======================================================
+# =====================================================
+# HERO
+# =====================================================
 
-st.markdown(
+hero(
+
+    "👥 Customer Intelligence",
+
+    "Understanding Customer Behaviour Through RFM Analysis",
+
+    """
+Customer Intelligence transforms transactional data into actionable customer insights.
+
+This dashboard uses Recency, Frequency and Monetary (RFM) Analysis to identify
+high-value customers, detect customers at risk of churn, understand purchasing
+behaviour and support personalized marketing strategies.
 """
-<div style="
-background:linear-gradient(135deg,#0F172A,#1E3A8A);
-padding:45px;
-border-radius:20px;
-margin-bottom:30px;
-color:white;
-">
 
-<h1 style="
-margin:0;
-font-size:42px;
-font-weight:700;
-color:white;
-">
-
-👥 Customer Analysis
-
-</h1>
-
-<p style="
-font-size:18px;
-line-height:1.8;
-margin-top:15px;
-color:#E5E7EB;
-">
-
-Understand customer purchasing behaviour using RFM analysis,
-identify high-value customers,
-measure customer value,
-and discover opportunities to improve retention and long-term profitability.
-
-</p>
-
-</div>
-""",
-unsafe_allow_html=True,
 )
 
-# ======================================================
-# CUSTOMER SNAPSHOT
-# ======================================================
+spacer(2)
 
-st.markdown("<br>", unsafe_allow_html=True)
-
-st.markdown("""
-<h2 style="
-font-size:32px;
-font-weight:700;
-color:#0F172A;
-margin-bottom:5px;
-">
-📊 Customer Snapshot
-</h2>
-
-<p style="
-color:#64748B;
-font-size:17px;
-margin-bottom:25px;
-">
-A quick overview of customer value and purchasing activity.
-</p>
-""", unsafe_allow_html=True)
-
-# ======================================================
-# KPI METRICS
-# ======================================================
-
-total_customers = df["Customer ID"].nunique()
-total_revenue = df["Revenue"].sum()
-total_orders = df["Invoice"].nunique()
-
-avg_customer_value = (
-    total_revenue / total_customers
-    if total_customers else 0
-)
-
-avg_orders = (
-    total_orders / total_customers
-    if total_customers else 0
-)
-
-c1, c2, c3 = st.columns(3)
-
-with c1:
-    st.metric(
-        "👥 Customers",
-        f"{total_customers:,}"
-    )
-
-with c2:
-    st.metric(
-        "💰 Avg Revenue / Customer",
-        f"${avg_customer_value:,.2f}"
-    )
-
-with c3:
-    st.metric(
-        "🛒 Avg Orders / Customer",
-        f"{avg_orders:.2f}"
-    )
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-# ======================================================
-# BUSINESS INSIGHT
-# ======================================================
-
-insight_box(
-"""
-Customer analysis helps identify your most valuable customers,
-understand purchasing behaviour, and recognize opportunities to improve
-customer retention and long-term revenue growth through data-driven decisions.
-"""
-)
-
-# ======================================================
-# TOP CUSTOMERS BY REVENUE
-# ======================================================
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-st.markdown("""
-<div style="
-background:white;
-padding:28px;
-border-radius:20px;
-box-shadow:0 8px 24px rgba(15,23,42,.08);
-border:1px solid #E5E7EB;
-">
-
-<h3 style="margin-top:0;color:#0F172A;">
-🏆 Top Customers by Revenue
-</h3>
-
-<p style="color:#64748B;">
-Identify the highest-value customers based on total revenue contribution.
-</p>
-
-</div>
-""", unsafe_allow_html=True)
-
-customer_sales = (
-    df.groupby("Customer ID")["Revenue"]
-      .sum()
-      .sort_values(ascending=False)
-      .head(10)
-      .reset_index()
-)
-
-customer_sales["Customer ID"] = (
-    customer_sales["Customer ID"]
-    .astype(int)
-    .astype(str)
-)
-
-fig = px.bar(
-    customer_sales,
-    x="Revenue",
-    y="Customer ID",
-    orientation="h",
-    text="Revenue",
-    color="Revenue",
-    color_continuous_scale="Blues"
-)
-
-fig.update_traces(
-    texttemplate="$%{text:,.0f}",
-    textposition="outside"
-)
-
-fig.update_layout(
-    template="plotly_white",
-    height=500,
-    paper_bgcolor="white",
-    plot_bgcolor="white",
-    margin=dict(l=20,r=20,t=20,b=20),
-    coloraxis_showscale=False,
-    yaxis=dict(
-        autorange="reversed",
-        title=""
-    ),
-    xaxis_title="Revenue ($)"
-)
-
-st.plotly_chart(fig, width="stretch")
-
-insight_box(
-"""
-A small group of customers contributes a significant portion of total revenue.
-Protecting these relationships through loyalty programs and personalized offers can
-have a substantial impact on long-term business performance.
-"""
-)
-
-
-# ======================================================
-# TOP CUSTOMERS BY ORDERS
-# ======================================================
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-st.markdown("""
-<div style="
-background:white;
-padding:28px;
-border-radius:20px;
-box-shadow:0 8px 24px rgba(15,23,42,.08);
-border:1px solid #E5E7EB;
-">
-
-<h3 style="margin-top:0;color:#0F172A;">
-📦 Top Customers by Number of Orders
-</h3>
-
-<p style="color:#64748B;">
-Customers with the highest purchasing frequency across all transactions.
-</p>
-
-</div>
-""", unsafe_allow_html=True)
-
-customer_orders = (
-    df.groupby("Customer ID")["Invoice"]
-      .nunique()
-      .sort_values(ascending=False)
-      .head(10)
-      .reset_index(name="Orders")
-)
-
-customer_orders["Customer ID"] = (
-    customer_orders["Customer ID"]
-    .astype(int)
-    .astype(str)
-)
-
-fig = px.bar(
-    customer_orders,
-    x="Orders",
-    y="Customer ID",
-    orientation="h",
-    text="Orders",
-    color="Orders",
-    color_continuous_scale="Blues"
-)
-
-fig.update_traces(
-    textposition="outside"
-)
-
-fig.update_layout(
-    template="plotly_white",
-    height=500,
-    paper_bgcolor="white",
-    plot_bgcolor="white",
-    margin=dict(l=20, r=20, t=20, b=20),
-    coloraxis_showscale=False,
-    yaxis=dict(
-        autorange="reversed",
-        title=""
-    ),
-    xaxis_title="Number of Orders"
-)
-
-st.plotly_chart(fig, width="stretch")
-
-insight_box(
-"""
-Customers with a high purchase frequency represent strong loyalty and repeat engagement.
-These customers are ideal candidates for loyalty programs, exclusive offers, and personalized marketing campaigns.
-"""
-)
-# ======================================================
-# RFM ANALYSIS
-# ======================================================
-
-# ======================================================
-# RFM CUSTOMER ANALYSIS
-# ======================================================
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-st.markdown("""
-<div style="
-background:linear-gradient(135deg,#0F172A,#1E3A8A);
-padding:32px;
-border-radius:22px;
-color:white;
-margin-bottom:30px;
-">
-
-<h2 style="
-margin:0;
-font-size:34px;
-font-weight:700;
-color:white;
-">
-⭐ RFM Customer Analysis
-</h2>
-
-<p style="
-margin-top:18px;
-font-size:17px;
-line-height:1.8;
-color:#E5E7EB;
-">
-RFM (Recency, Frequency and Monetary) analysis helps identify your most valuable customers,
-understand purchasing behaviour and discover customers who are likely to churn.
-</p>
-
-</div>
-""", unsafe_allow_html=True)
-
-# ======================================================
+# =====================================================
 # CREATE RFM TABLE
-# ======================================================
+# =====================================================
 
-latest_date = df["InvoiceDate"].max()
+section(
+    "📊 RFM Customer Analysis",
+    "Calculate customer Recency, Frequency and Monetary values."
+)
+
+# -----------------------------------------------------
+# Remove customers with missing Customer ID
+# -----------------------------------------------------
+
+rfm_df = df.dropna(subset=["Customer ID"]).copy()
+
+rfm_df["Customer ID"] = (
+    rfm_df["Customer ID"]
+    .astype(int)
+)
+
+# -----------------------------------------------------
+# Reference Date
+# One day after the last transaction
+# -----------------------------------------------------
+
+snapshot_date = (
+    rfm_df["InvoiceDate"].max() +
+    pd.Timedelta(days=1)
+)
+
+# -----------------------------------------------------
+# Create RFM Table
+# -----------------------------------------------------
 
 rfm = (
-    df.groupby("Customer ID")
-      .agg(
-          Recency=("InvoiceDate", lambda x: (latest_date - x.max()).days),
-          Frequency=("Invoice", "nunique"),
-          Monetary=("Revenue", "sum")
-      )
-      .reset_index()
+    rfm_df.groupby("Customer ID")
+    .agg(
+
+        Recency=(
+            "InvoiceDate",
+            lambda x: (snapshot_date - x.max()).days
+        ),
+
+        Frequency=(
+            "Invoice",
+            "nunique"
+        ),
+
+        Monetary=(
+            "Revenue",
+            "sum"
+        )
+
+    )
+    .reset_index()
 )
+
+spacer(2)
+
+# =====================================================
+# CUSTOMER KPIs
+# =====================================================
+
+section(
+    "👥 Customer Overview",
+    "Key metrics describing customer behaviour."
+)
+
+total_customers = len(rfm)
+
+avg_recency = rfm["Recency"].mean()
+
+avg_frequency = rfm["Frequency"].mean()
+
+avg_monetary = rfm["Monetary"].mean()
+
+highest_customer = rfm["Monetary"].max()
+
+kpi_row([
+
+{
+"title":"👥 Customers",
+"value":f"{total_customers:,}"
+},
+
+{
+"title":"📅 Avg Recency",
+"value":f"{avg_recency:.0f} Days"
+},
+
+{
+"title":"🔄 Avg Frequency",
+"value":f"{avg_frequency:.1f}"
+},
+
+{
+"title":"💰 Avg Monetary",
+"value":f"${avg_monetary:,.0f}"
+},
+
+{
+"title":"🏆 Highest Customer Value",
+"value":f"${highest_customer:,.0f}"
+}
+
+])
+
+insight_box(
+"""
+The RFM table summarizes customer purchasing behaviour into three dimensions:
+how recently customers purchased, how frequently they buy and how much they spend.
+These metrics form the foundation for customer segmentation and retention strategies.
+"""
+)
+
+spacer(2)
+
+# =====================================================
+# RFM SCORING
+# =====================================================
+
+section(
+    "🏆 RFM Scoring",
+    "Rank customers based on Recency, Frequency and Monetary behaviour."
+)
+
+# -----------------------------------------------------
+# R Score
+# Lower Recency = Better
+# -----------------------------------------------------
 
 rfm["R_Score"] = pd.qcut(
     rfm["Recency"],
     q=5,
-    labels=[5,4,3,2,1],
-    duplicates="drop"
+    labels=[5, 4, 3, 2, 1]
 ).astype(int)
+
+# -----------------------------------------------------
+# F Score
+# Higher Frequency = Better
+# -----------------------------------------------------
 
 rfm["F_Score"] = pd.qcut(
     rfm["Frequency"].rank(method="first"),
     q=5,
-    labels=[1,2,3,4,5],
-    duplicates="drop"
+    labels=[1, 2, 3, 4, 5]
 ).astype(int)
+
+# -----------------------------------------------------
+# M Score
+# Higher Monetary = Better
+# -----------------------------------------------------
 
 rfm["M_Score"] = pd.qcut(
-    rfm["Monetary"],
+    rfm["Monetary"].rank(method="first"),
     q=5,
-    labels=[1,2,3,4,5],
-    duplicates="drop"
+    labels=[1, 2, 3, 4, 5]
 ).astype(int)
 
+# -----------------------------------------------------
+# Overall RFM Score
+# -----------------------------------------------------
 
-def segment_customer(row):
+rfm["RFM_Score"] = (
+    rfm["R_Score"].astype(str) +
+    rfm["F_Score"].astype(str) +
+    rfm["M_Score"].astype(str)
+)
 
-    if row["R_Score"] >= 4 and row["F_Score"] >= 4 and row["M_Score"] >= 4:
+insight_box(
+"""
+Customers are scored from **1 (lowest)** to **5 (highest)** for each RFM metric.
+Using quintiles ensures customers are evaluated relative to the overall customer base,
+making the segmentation robust and adaptable to different datasets.
+"""
+)
+
+spacer(2)
+
+# =====================================================
+# CUSTOMER SEGMENTATION
+# =====================================================
+
+section(
+    "🎯 Customer Segmentation",
+    "Classify customers into actionable business segments."
+)
+
+def assign_segment(row):
+
+    r = row["R_Score"]
+    f = row["F_Score"]
+    m = row["M_Score"]
+
+    if r >= 4 and f >= 4 and m >= 4:
         return "Champions"
 
-    elif row["R_Score"] >= 3 and row["F_Score"] >= 3:
+    elif r >= 3 and f >= 4:
         return "Loyal Customers"
 
-    elif row["R_Score"] >= 3 and row["F_Score"] <= 2:
+    elif r >= 4 and f <= 2:
         return "Potential Loyalists"
 
-    elif row["R_Score"] <= 2 and row["F_Score"] >= 3:
+    elif r <= 2 and f >= 3:
         return "At Risk"
 
     else:
-        return "Lost Customers"
+        return "Others"
 
+rfm["Segment"] = rfm.apply(assign_segment, axis=1)
 
-rfm["Segment"] = rfm.apply(segment_customer, axis=1)
+segment_summary = (
+    rfm.groupby("Segment", as_index=False)
+       .agg(
+           Customers=("Customer ID", "count"),
+           Revenue=("Monetary", "sum")
+       )
+       .sort_values("Revenue", ascending=False)
+)
 
-# ======================================================
+spacer(2)
+
+# =====================================================
+# CUSTOMER SEGMENT DISTRIBUTION
+# =====================================================
+
+section(
+    "🍩 Customer Segment Distribution",
+    "Understand how customers are distributed across RFM segments."
+)
+
+segment_count = (
+    rfm["Segment"]
+       .value_counts()
+       .reset_index()
+)
+
+segment_count.columns = ["Segment", "Customers"]
+
+chart_title(
+    "Customer Distribution by Segment",
+    "Proportion of customers in each RFM segment."
+)
+
+fig = px.pie(
+    segment_count,
+    names="Segment",
+    values="Customers",
+    hole=0.55
+)
+
+fig.update_traces(
+    textposition="inside",
+    textinfo="percent+label"
+)
+
+fig.update_layout(
+    template="plotly_white",
+    height=500,
+    showlegend=False
+)
+
+st.plotly_chart(
+    fig,
+    use_container_width=True
+)
+
+largest_segment = segment_count.iloc[0]
+
+insight_box(
+f"""
+The largest customer segment is **{largest_segment['Segment']}**, representing
+**{largest_segment['Customers']}** customers.
+
+This distribution provides an overview of customer quality and highlights
+where marketing and retention strategies should be focused.
+"""
+)
+
+spacer(2)
+
+# =====================================================
 # REVENUE BY SEGMENT
-# ======================================================
+# =====================================================
 
-st.markdown("""
-<div style="
-background:white;
-padding:28px;
-border-radius:20px;
-box-shadow:0 8px 24px rgba(15,23,42,.08);
-border:1px solid #E5E7EB;
-margin-bottom:20px;
-">
-
-<h3 style="
-margin-top:0;
-font-size:28px;
-font-weight:700;
-color:#0F172A;
-">
-💰 Revenue by Customer Segment
-</h3>
-
-<p style="
-font-size:16px;
-color:#64748B;
-margin-bottom:0;
-">
-Compare the revenue contribution of each customer segment and identify which groups drive the business.
-</p>
-
-</div>
-""", unsafe_allow_html=True)
+section(
+    "💰 Revenue Contribution by Segment",
+    "Compare the revenue generated by each customer segment."
+)
 
 segment_revenue = (
-    rfm.groupby("Segment")["Monetary"]
-       .sum()
-       .reset_index()
-       .sort_values("Monetary", ascending=False)
+    rfm.groupby("Segment", as_index=False)
+       .agg(
+           Revenue=("Monetary", "sum")
+       )
+       .sort_values("Revenue", ascending=False)
+)
+
+chart_title(
+    "Revenue by Customer Segment",
+    "Identify the most valuable customer groups."
 )
 
 fig = px.bar(
     segment_revenue,
-    x="Monetary",
+    x="Revenue",
     y="Segment",
     orientation="h",
-    text="Monetary",
-    color="Monetary",
+    color="Revenue",
+    text="Revenue",
     color_continuous_scale="Blues"
 )
 
@@ -467,22 +382,146 @@ fig.update_traces(
 
 fig.update_layout(
     template="plotly_white",
-    height=500,
-    paper_bgcolor="white",
-    plot_bgcolor="white",
-    margin=dict(l=20, r=20, t=20, b=20),
+    height=450,
     coloraxis_showscale=False,
-    yaxis=dict(
-        autorange="reversed",
-        title=""
-    ),
-    xaxis_title="Revenue ($)"
+    yaxis=dict(autorange="reversed"),
+    xaxis_title="Revenue ($)",
+    yaxis_title=""
 )
-st.plotly_chart(fig, width="stretch")
-insight_box("""
-**Business Insight**
 
-Champions and Loyal Customers typically contribute the largest share of revenue.
-Prioritizing retention campaigns for these segments while re-engaging At Risk and Lost Customers can significantly improve long-term profitability.
-""")
+st.plotly_chart(
+    fig,
+    use_container_width=True
+)
+
+top_segment = segment_revenue.iloc[0]
+
+recommendation_box(
+f"""
+The **{top_segment['Segment']}** segment generates the highest customer revenue.
+
+Retention campaigns should prioritize this group, while personalized engagement
+strategies should be developed to move lower-value customers into higher-value segments.
+"""
+)
+
+spacer(2)
+
+
+# =====================================================
+# CUSTOMER VALUE MATRIX
+# =====================================================
+
+# =====================================================
+# CUSTOMER VALUE MATRIX
+# =====================================================
+
+section(
+    "🫧 Customer Value Matrix",
+    "Identify high-value customers using Frequency and Monetary analysis."
+)
+
+# Top 500 customers by revenue for better readability
+bubble_df = (
+    rfm.sort_values("Monetary", ascending=False)
+       .head(500)
+)
+
+chart_title(
+    "Customer Value Matrix",
+    "Higher-value customers appear as larger bubbles. Dashed lines show the median values."
+)
+
+fig = px.scatter(
+    bubble_df,
+    x="Frequency",
+    y="Monetary",
+    size="Monetary",
+    color="Segment",
+    hover_name="Customer ID",
+    hover_data={
+        "Recency": True,
+        "Frequency": True,
+        "Monetary": ":,.2f"
+    },
+    size_max=40,
+    log_y=True
+)
+
+# Median reference lines
+median_frequency = bubble_df["Frequency"].median()
+median_monetary = bubble_df["Monetary"].median()
+
+fig.add_vline(
+    x=median_frequency,
+    line_dash="dash",
+    line_color="gray"
+)
+
+fig.add_hline(
+    y=median_monetary,
+    line_dash="dash",
+    line_color="gray"
+)
+
+fig.update_layout(
+    template="plotly_white",
+    height=600,
+    xaxis_title="Purchase Frequency",
+    yaxis_title="Customer Monetary Value (Log Scale)",
+    legend_title="Customer Segment"
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+insight_box(
+"""
+Customers in the upper-right quadrant purchase frequently and generate high revenue, making them the most valuable customers. The dashed median lines divide customers into four behavioural groups, helping identify opportunities for retention, upselling and re-engagement.
+"""
+)
+
+recommendation_box(
+"""
+Prioritize retention campaigns for customers in the upper-right quadrant. Develop upselling strategies for frequent buyers with lower spending and targeted win-back campaigns for valuable customers with declining purchase activity.
+"""
+)
+
+spacer(2)
+
+# =====================================================
+# CUSTOMER INTELLIGENCE SUMMARY
+# =====================================================
+
+section(
+    "📝 Customer Intelligence Summary",
+    "Key business findings from customer behaviour analysis."
+)
+
+st.markdown("""
+<div class="card">
+
+### Key Findings
+
+- RFM Analysis identifies customers based on purchasing behaviour rather than total revenue alone.
+
+- Champions and Loyal Customers contribute a significant share of revenue and should be prioritized for retention.
+
+- At Risk customers represent an opportunity for targeted win-back campaigns.
+
+- Customer segmentation enables personalized marketing instead of treating all customers equally.
+
+- Customer value varies considerably, highlighting the importance of tailored CRM strategies.
+
+</div>
+""", unsafe_allow_html=True)
+
+recommendation_box(
+"""
+Implement personalized marketing campaigns based on customer segments.
+Retention initiatives should focus on Champions and Loyal Customers,
+while At Risk customers should receive targeted offers to encourage repeat purchases.
+"""
+)
+
+footer()
 

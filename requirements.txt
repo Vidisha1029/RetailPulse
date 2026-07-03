@@ -2,7 +2,8 @@ streamlit
 pandas
 numpy
 plotly
-scikit-learn
-statsmodels
 prophet
-joblib
+matplotlib
+scikit-learn
+scipy
+openpyxl
